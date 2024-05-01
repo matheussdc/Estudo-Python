@@ -27,6 +27,8 @@ def main():
                         saldo += valor_depositado
                         extrato_historico.append(f"Depósito de R$ {valor_depositado:.2f}")
                         break
+                    elif valor_depositado == 0:
+                        break
                     else:
                         print("Valor inválido para depósito!! - ", end="")
                 except ValueError:
@@ -50,6 +52,8 @@ def main():
                         saldo -= valor_sacado
                         extrato_historico.append(f"Saque de R$ {valor_sacado:.2f}")
                         saque_limite_vezes -= 1
+                        break
+                    elif valor_sacado == 0:
                         break
                     else:
                         print("Valor inválido para saque!! - ", end="")
