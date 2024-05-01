@@ -2,7 +2,7 @@ import textwrap
 
 
 def main():
-    menu = """\
+    menu = """
     MENU
     [1] - Depósito
     [2] - Saque
@@ -11,7 +11,7 @@ def main():
     Selecione uma operação: """
 
     saldo = 0                   #Saldo inicial = 0
-    extrato_historico = []                #Extrato com registro de depósitos e saques por String
+    extrato_historico = []      #Extrato com registro de depósitos e saques por String
     saque_limite_valor = 500.00 #Limite de saque diário R$500.00
     saque_limite_vezes = 3      #No máximo 3 saques por dia
 
@@ -61,7 +61,12 @@ def main():
                     print("Valor inválido para saque!! - ", end="")
 
         elif operation == '3':
-            print("Extrato")
+            if extrato_historico:
+                for movimentacao in extrato_historico:
+                    print(movimentacao)
+            else:
+                print("Não foram realizadas movimentações")
+            print(f"Saldo disponível: R$ {saldo:.2f}")
 
         elif operation == 'q':
             print("Saída")
