@@ -23,12 +23,23 @@ def criar_usuario(lista_usuarios):
     data = input("Insira a data de nascimento do novo usuário: ")
     logradouro = input("Insira o logradouro do novo usuário: ")
     numero = input("Insiro número do endereço do novo usuário: ")
-    cidade = input("Insira a cidade do novo usuário: ")
     bairro = input("Insira o bairro do novo usuário: ")
+    cidade = input("Insira a cidade do novo usuário: ")
     estado = input("Insira o estado do novo usuário: ")
-    endereco = {"logradouro": logradouro, "numero": numero, "bairro": bairro, "estado": estado}
-    novo_usuario = {"nome": nome, "data de nascimento": data, "endereço": endereco}
+    endereco = {"logradouro": logradouro, "numero": numero, "cidade": cidade, "bairro": bairro, "estado": estado}
+    novo_usuario = {cpf: {"nome": nome, "nascimento": data, "endereço": endereco}}
     return novo_usuario
+
+
+def listar_usuarios(lista_usuarios):
+    print("Usuários:")
+    if lista_usuarios:
+        for cpf, user in lista_usuarios.items():
+            nome, data, endereco = user.values()
+            log, num, city, bairro, estado = endereco.values()
+            print(f"{cpf}: Nome: {nome}, Nascimento: {data}, Endereço: {log} - {num} - {bairro} - {city}/{estado}")
+    else:
+        print("Não há usuários cadastrados")
 
 
 def criar_conta_corrente(): # Agência, nro da conta, usuário
@@ -42,9 +53,10 @@ def main():
     [2] - Saque
     [3] - Extrato
     [4] - Criar Usuário
+    [5] - Listar Usuários
     [q] - Sair
     Selecione uma operação: """
-    lista_usuarios = []
+    lista_usuarios = {}
     saldo = 0                    # Saldo inicial = 0
     extrato_historico = []       # Extrato com registro de depósitos e saques por String
     saque_limite_valor = 500.00  # Limite de saque diário R$500.00
@@ -60,12 +72,15 @@ def main():
             saque()
 
         elif operation == '3':
-            extrato()
+            extrato(2, extrato=3)
 
         elif operation == '4':
             novo_usuario = criar_usuario(lista_usuarios)
             if novo_usuario is not None:
-                lista_usuarios.append(novo_usuario)
+                lista_usuarios.update(novo_usuario)
+
+        elif operation == '5':
+            listar_usuarios(lista_usuarios)
 
         elif operation == 'q':
             print("Saída")
