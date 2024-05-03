@@ -73,8 +73,25 @@ def listar_usuarios(lista_usuarios):
         print("Não há usuários cadastrados")
 
 
-def criar_conta_corrente(lista_usuarios): # Agência, nro da conta, usuário
-    return None
+def criar_conta_corrente(lista_usuarios, numero_conta): # Agência, nro da conta, usuário
+    cpf_user = input("Criar Conta Corrente - Insira o CPF do usuário: ")
+    for cpf, user in lista_usuarios:
+        if cpf_user == cpf:
+            numero_conta += 1
+            conta = (numero_conta, {"agência": "0001", "CPF": cpf_user})
+            return conta, numero_conta
+    print("Usuário não existe!!")
+    return None, numero_conta
+
+
+def listar_contas(lista_contas):
+    print("Contas Correntes:")
+    if lista_contas:
+        for numero, conta in lista_contas:
+            agencia, cpf = conta.values()
+            print(f"Conta Nº {numero} - Agencia {agencia} - CPF: {cpf}")
+    else:
+        print("Não há contas registradas")
 
 
 def main():
@@ -89,8 +106,9 @@ def main():
     [7] - Listar Contas
     [q] - Sair
     Selecione uma operação: """
-    lista_usuarios = []
-    lista_contas = []
+    lista_usuarios = []          # Lista com os usuários cadastrados
+    lista_contas = []            # Lista com as contas correntes registradas
+    total_contas = 0
     saldo = 0                    # Saldo inicial = 0
     extrato_historico = []       # Extrato com registro de depósitos e saques por String
     saque_limite_valor = 500.00  # Limite de saque diário R$500.00
@@ -128,10 +146,13 @@ def main():
         elif operation == '5':
             listar_usuarios(lista_usuarios)
 
-        elif operation =='6':
-            nova_conta = criar_conta_corrente(lista_usuarios)
+        elif operation == '6':
+            nova_conta, total_contas = criar_conta_corrente(lista_usuarios, total_contas)
             if nova_conta is not None:
                 lista_contas.append(nova_conta)
+
+        elif operation == '7':
+            listar_contas(lista_contas)
 
         elif operation == 'q':
             print("Saída")
