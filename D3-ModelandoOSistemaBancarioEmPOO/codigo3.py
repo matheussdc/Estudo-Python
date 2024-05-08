@@ -1,4 +1,4 @@
-import textwrap
+# import textwrap
 from abc import ABC, abstractmethod
 
 
@@ -13,6 +13,10 @@ class Conta:
     @property
     def saldo(self):
         return self._saldo
+
+    @property
+    def historico(self):
+        return self.historico
 
     @classmethod
     def nova_conta(cls, cliente, numero):
@@ -30,9 +34,12 @@ class Conta:
         return False
 
     def depositar(self, valor):
-        self._saldo += valor
-        self._historico.adicionar_transacao(Deposito(valor))
-        return True
+        if valor > 0:
+            self._saldo += valor
+            self._historico.adicionar_transacao(Deposito(valor))
+            return True
+        print("Valor inválido para depósito!!")
+        return False
 
 
 class ContaCorrente(Conta):
@@ -61,7 +68,11 @@ class Cliente:
         self._contas = []
 
     def realizar_transacao(self, conta, transacao):
-        return None
+        if conta in self._contas:
+            transacao.registrar(conta)
+            return True
+        print("Conta não pertence a este cliente!!")
+        return False
 
     def adicionar_conta(self, conta):
         self._contas.append(conta)
@@ -90,7 +101,6 @@ class Transacao(ABC):
     def valor(self):
         pass
 
-    @classmethod
     @abstractmethod
     def registrar(self, conta):
         pass
@@ -105,7 +115,11 @@ class Deposito(Transacao):
         return self._valor
 
     def registrar(self, conta):
-        return self._valor
+        deposito_validado = conta.depositar(self._valor)
+        if deposito_validado:
+            conta.historico.adicionar_transacao(self)
+            return True
+        return False
 
 
 class Saque(Transacao):
@@ -117,7 +131,11 @@ class Saque(Transacao):
         return self._valor
 
     def registrar(self, conta):
-        return self._valor
+        saque_validado = conta.sacar(self._valor)
+        if saque_validado:
+            conta.historico.adicionar_transacao(self)
+            return True
+        return False
 
 
 def main():
