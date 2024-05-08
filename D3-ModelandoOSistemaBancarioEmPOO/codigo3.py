@@ -1,4 +1,4 @@
-# import textwrap
+import textwrap
 from abc import ABC, abstractmethod
 
 
@@ -16,7 +16,7 @@ class Conta:
 
     @property
     def historico(self):
-        return self.historico
+        return self._historico
 
     @classmethod
     def nova_conta(cls, cliente, numero):
@@ -28,7 +28,6 @@ class Conta:
             return False
         if valor > 0:
             self._saldo -= valor
-            self._historico.adicionar_transacao(Saque(valor))
             return True
         print("Valor inválido para saque!!")
         return False
@@ -36,7 +35,6 @@ class Conta:
     def depositar(self, valor):
         if valor > 0:
             self._saldo += valor
-            self._historico.adicionar_transacao(Deposito(valor))
             return True
         print("Valor inválido para depósito!!")
         return False
@@ -57,9 +55,11 @@ class ContaCorrente(Conta):
         if valor > self._limite:
             print(f"Valor limite de R$ {self._limite:.2f} de saque ultrapassado!!")
             return False
-        super().sacar(valor)
-        self._saques_realizados += 1
-        return True
+        saque_validado = super().sacar(valor)
+        if saque_validado:
+            self._saques_realizados += 1
+            return True
+        return False
 
 
 class Cliente:
@@ -78,7 +78,7 @@ class Cliente:
         self._contas.append(conta)
 
 
-class PesosaFisica(Cliente):
+class PessoaFisica(Cliente):
     def __init__(self, endereco, cpf, nome, data_de_nascimento):
         super().__init__(endereco)
         self._cpf = cpf
@@ -139,7 +139,43 @@ class Saque(Transacao):
 
 
 def main():
-    print("Hello World")
+    # Instanciação simples de PessoaFisica
+    pessoa1 = PessoaFisica("Av dos Bobos, 123", "123123123", "Pedro Monte", "12/08/2013")
+    # Instanciação e associação de uma ContaCorrente a uma PessoaFisica
+    cc1 = ContaCorrente("Bradesco", pessoa1, 400.00, 3)
+    pessoa1.adicionar_conta(cc1)
+
+    # Realiza um depósito de 500,00 na ContaCorrente cc1
+    pessoa1.realizar_transacao(cc1, Deposito(4321.56))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após depósito inicial")
+
+    # Realiza um depósito inválido com valor negativo
+    pessoa1.realizar_transacao(cc1, Deposito(-3.14))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após depósito inválido")
+
+    # Realiza um saque válido
+    pessoa1.realizar_transacao(cc1, Saque(21.56))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após primeiro saque válido")
+
+    # Realiza um saque inválido acima do limite de saque
+    pessoa1.realizar_transacao(cc1, Saque(401.00))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após saque acima do limite")
+
+    # Realiza um saque inválido com valor negativo
+    pessoa1.realizar_transacao(cc1, Saque(-3.14))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após saque inválido")
+
+    # Realiza segundo saque válido
+    pessoa1.realizar_transacao(cc1, Saque(102.00))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após segundo saque válido")
+
+    # Realiza terceiro e último possível saque válido
+    pessoa1.realizar_transacao(cc1, Saque(103.00))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após terceiro saque válido")
+
+    # Realiza um saque inválido acima do limite diário de saques
+    pessoa1.realizar_transacao(cc1, Saque(104.00))
+    print(f"#Saldo atual da conta cc1 = {cc1.saldo} após tentativa de saque acima do limite diário")
 
 
 if __name__ == '__main__':
