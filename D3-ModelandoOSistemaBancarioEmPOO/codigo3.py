@@ -1,5 +1,5 @@
 import textwrap
-from abc import ABC, abstractproperty, abstractclassmethod
+from abc import ABC, abstractmethod
 
 
 class Conta:
@@ -26,16 +26,33 @@ class Conta:
             self._saldo -= valor
             self._historico.adicionar_transacao(Saque(valor))
             return True
+        print("Valor inválido para saque!!")
+        return False
 
     def depositar(self, valor):
-        return 4
+        self._saldo += valor
+        self._historico.adicionar_transacao(Deposito(valor))
+        return True
 
 
 class ContaCorrente(Conta):
+    _saques_realizados = 0
+
     def __init__(self, agencia, cliente, limite=500.00, limite_saques=3):
         super().__init__(agencia, cliente)
-        self.limite = limite
-        self.limite_saques = limite_saques
+        self._limite = limite
+        self._limite_saques = limite_saques
+
+    def sacar(self, valor):
+        if self._saques_realizados >= self._limite_saques:
+            print("Limite de saque diário atingido!!")
+            return False
+        if valor > self._limite:
+            print(f"Valor limite de R$ {self._limite:.2f} de saque ultrapassado!!")
+            return False
+        super().sacar(valor)
+        self._saques_realizados += 1
+        return True
 
 
 class Cliente:
@@ -69,11 +86,12 @@ class Historico:
 
 class Transacao(ABC):
     @property
-    @abstractproperty
+    @abstractmethod
     def valor(self):
         pass
 
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def registrar(self, conta):
         pass
 
